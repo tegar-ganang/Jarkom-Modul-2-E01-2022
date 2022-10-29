@@ -300,9 +300,110 @@ hasilnya seperti berikut
 ## Soal 8
 #### Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.wise.yyy.com. Pertama, Loid membutuhkan webserver dengan DocumentRoot pada /var/www/wise.yyy.com
 #### Jawaban
+
+#### Wise 
+
+Melakukan instalasi **PHP**, **Apache2**, dan **Library Apache2** terlebih dahulu pada `Wisse` 
+dengan *update package list*. *Command* yang dijalankan adalah sebagai berikut. 
+
+*Download file requirement* yang [sudah diberikan](https://drive.google.com/drive/folders/1SqvSSgirm7O7doKzTVh4YHGWkeRAzsfs) lewat *notes* di bawah menggunakan `wget`.
+
+*Unzip* **.zip** yang telah diunduh dan diletakkan di folder **root**.
+
+Buat folder baru, yaitu **wise.e01.com** pada **/var/www**.
+
+*Copy* semua *file* yang ada di folder hasil *unzip* ke folder **/var/www/wise.e01.com**.
+
+*Copy file* **000-default.conf** ke dalam folder **sites-available** dan ubah namanya menjadi **wise.e01.com.conf**.
+
+Buka *file* **wise.e01.com.conf** dan edit seperti konfigurasi berikut.
+
+Aktifkan konfigurasi website dengan *command* berikut.
+
+*Restart* **apache2**.
+
+#### SSS atau Garden
+
+Lakukan *testing* pada `SSS` dan `Garden` untuk cek apakah [**wise.e01.com**](wise.e01.com) atau [**www.wise.e01.com**](www.wise.e01.com) dapat diakses. Menggunakan **Lynx** untuk mengeceknya. *Install* terlebih dahulu **Lynx** jika belum ada.
+```
+// Ubah nameserver menjadi 192.168.122.1 agar bisa mengunduh, jangan lupa untuk mengembalikan ke bentuk semula
+apt-get install lynx -y
+```
+
+Kemudian, lakukan perintah ini untuk membuka website.
+
+Jika sukses, maka akan memunculkan hasil seperti berikut.
+
 ## Soal 9
 #### Setelah itu, Loid juga membutuhkan agar url www.wise.yyy.com/index.php/home dapat menjadi menjadi www.wise.yyy.com/home
 #### Jawaban
+
+### Wise
+
+Buka *file* **wise.e01.com.conf** dan tambahkan seperti konfigurasi berikut.
+
+Buat *file* **.htaccess** pada folder **/var/www/wise.e01.com** dan tambahkan seperti konfigurasi berikut.
+
+Aktifkan **module rewrite** agar penulisan URL menjadi lebih rapi.
+```
+a2enmod rewrite
+```
+
+*Restart* **apache2**.
+```
+service apache2 restart
+```
+### SSS atau Garden
+
+Lakukan *testing* pada `SSS` dan `Garden` untuk cek apakah **module rewrite** berhasil dilakukan.
+
+
+Jika sukses, maka akan memunculkan hasil seperti berikut.
+
+
 ## Soal 10
 #### Setelah itu, pada subdomain www.eden.wise.yyy.com, Loid membutuhkan penyimpanan aset yang memiliki DocumentRoot pada /var/www/eden.wise.yyy.com
 #### Jawaban
+
+### Wise
+
+*Unzip* **.zip** yang telah diunduh dan diletakkan di folder **root**.
+
+
+Buat folder baru, yaitu **super.wise.e01.com** pada **/var/www**.
+```
+mkdir /var/www/super.wise.e01.com
+```
+
+*Copy* semua *file* yang ada di folder hasil *unzip* ke folder **/var/www/super.wise.e01.com**.
+```
+cp -r ~/super.franky/error /var/www/wise.e01.com
+cp -r ~/super.franky/public /var/www/wise.e01.com
+```
+
+*Copy file* **000-default.conf** ke dalam folder **sites-available** dan ubah namanya menjadi **super.wise.e01.com.conf**.
+```
+cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/super.wise.e01.com.conf
+```
+
+Buka *file* **super.wise.e01.com.conf** dan tambahkan seperti konfigurasi berikut.
+
+Aktifkan konfigurasi website dengan *command* berikut.
+```
+a2ensite super.wise.e01.com.conf
+```
+
+*Restart* **apache2**.
+```
+service apache2 restart
+```
+
+### SSS atau Garden
+
+Lakukan *testing* pada `SSS` dan `Garden` untuk cek apakah [**super.wise.e01.com**](super.wise.e01.com) atau [**www.super.wise.e01.com**](www.super.wise.e01.com) dapat diakses. 
+```
+lynx super.wise.e01.com
+lynx www.super.wise.e01.com
+```
+
+Jika sukses, maka akan memunculkan hasil seperti berikut.

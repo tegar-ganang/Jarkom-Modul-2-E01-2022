@@ -275,8 +275,10 @@ service bind9 restart
 Lakukan testing pada SSS dan Garden untuk mengecek apakah DNS Slave berhasil dibuat pada Berlint. untuk itu Stop service bind9 pada Wise
 ```
 service bind9 stop
+```
 #### SSS atau Garden
 Pada `SSS` dan `Garden' ditambahkan nameserver `Berlint` yaitu 10.22.2.2 pada /etc/resolv.conf.
+
 ```
 echo  '
 nameserver 10.22.3.2
@@ -284,6 +286,7 @@ nameserver 10.22.2.2
 '  > /etc/resolv.conf
 ping wise.e01.com -c 5
 ```
+	
 hasilnya seperti berikut
 ![image](https://user-images.githubusercontent.com/85062827/198814003-38622ff9-0870-4691-bda4-dda0bca6f49a.png)
 

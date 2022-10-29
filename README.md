@@ -299,9 +299,139 @@ hasilnya seperti berikut
 ## Soal 6
 #### Karena banyak informasi dari Handler, buatlah subdomain yang khusus untuk operation yaitu operation.wise.yyy.com dengan alias www.operation.wise.yyy.com yang didelegasikan dari WISE ke Berlint dengan IP menuju ke Eden dalam folder operation
 #### Jawaban
+#### Wise
+Buka FIle wise.e01.com dan edit
+```
+echo  '
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     wise.e01.com. root.wise.e01.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@                       IN      NS      wise.e01.com.
+@                       IN      A       10.22.3.2
+www                     IN      CNAME   wise.e01.com.
+eden                    IN      A       10.22.2.3
+www.eden                IN      CNAME   eden
+ns2                     IN      A       10.22.2.2
+operation               IN      A       ns2
+www.operation           IN      CNAME   operation
+' > /etc/bind/wise/wise.e01.com
+service bind9 restart
+```
+Buka file /etc/bind/named.conf.options dan edit seperti konfigurasi berikut. Comment bagian dnssec-validation auto dan tambahkan di baris bawahnya allow-query{any;}.
+```
+echo  '
+options {
+        directory "/var/cache/bind";
+
+        allow-query{any;};
+
+        auth-nxdomain no;    # conform to RFC1035
+        listen-on-v6 { any; };
+};
+' > /etc/bind/named.conf.options
+	
+```
+#### Berlint
+Tambahkan konfigurasi berikut pada /etc/bind/named.conf.local di Berlint.
+```
+echo  'zone "operation.wise.e01.com" {
+        type master;
+        file "/etc/bind/operation/operation.wise.e01.com";
+};
+zone "wise.e01.com" {
+        type slave;
+	   masters { 10.22.3.2; };
+   file "/var/lib/bind/wise.e01.com";
+};
+' > /etc/bind/named.conf.local
+
+```
+Buat folder baru, yaitu operation pada /etc/bind.
+```
+mkdir /etc/bind/operation
+
+```
+Copy file db.local ke dalam folder operation dan ubah namanya menjadi operation.wise.e01.com.
+```
+cp /etc/bind/db.local /etc/bind/operation/operation.wise.e01.com
+```
+
+Buka file operation.wise,e01.com dan edit seperti konfigurasi berikut. dan restart bind9
+```
+echo  '
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     operation.wise.e01.com. root.operation.wise.e01.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@                       IN      NS      operation.wise.e01.com.
+@                       IN      A       10.22.2.3
+www                     IN      CNAME   operation.wise.e01.com.
+
+' > /etc/bind/operation/operation.wise.e01.com
+service bind9 restart 
+
+```
+#### SSS atau Garden
+Lakukan testing
+```
+ping operation.wise.e01.com -c 5
+ping www.operation.wise.e01.com -c 5
+
+```
+	![image](https://user-images.githubusercontent.com/85062827/198829538-2b6849f2-60d1-429f-ad6f-bfa59e1f4944.png)
+
+
 ## Soal 7
 #### Untuk informasi yang lebih spesifik mengenai Operation Strix, buatlah subdomain melalui Berlint dengan akses strix.operation.wise.yyy.com dengan alias www.strix.operation.wise.yyy.com yang mengarah ke Eden 
 #### Jawaban
+#### Berlint
+Tambahkan konfigurasi berikut pada /etc/bind/named.conf.local di Berlint
+```
+echo  '
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     operation.wise.e01.com. root.operation.wise.e01.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@                       IN      NS      operation.wise.e01.com.
+@                       IN      A       10.22.2.3
+www                     IN      CNAME   operation.wise.e01.com.
+strix                   IN      A       10.22.2.3
+www.strix               IN      CNAME   strix
+' > /etc/bind/operation/operation.wise.e01.com
+service bind9 restart
+
+```
+
+#### SSS atau Garden
+Lakukan testing
+```
+ping strix.operation.wise.e01.com -c 5
+ping www.strix.operation.wise.e01.com -c 5
+```
+![image](https://user-images.githubusercontent.com/85062827/198829702-f16ce558-4861-4cc8-849e-08ff299adf6e.png)
+
 ## Soal 8
 #### Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.wise.yyy.com. Pertama, Loid membutuhkan webserver dengan DocumentRoot pada /var/www/wise.yyy.com
 #### Jawaban
@@ -327,6 +457,39 @@ Aktifkan konfigurasi website dengan *command* berikut.
 
 *Restart* **apache2**.
 
+```
+apt-get update
+apt-get install apache2 -y
+apt-get install php -y
+apt-get install libapache2-mod-php7.0 -y
+
+apt-get install wget -y 
+apt-get install unzip -y
+
+wget https://raw.githubusercontent.com/tegar-ganang/Praktikum-Modul-2-Jarkom-E01/main/wise.zip
+wget https://raw.githubusercontent.com/tegar-ganang/Praktikum-Modul-2-Jarkom-E01/main/eden.wise.zip
+wget https://raw.githubusercontent.com/tegar-ganang/Praktikum-Modul-2-Jarkom-E01/main/strix.operation.wise.zip
+
+unzip ~/wise.zip -d ~/ 
+
+mkdir /var/www/wise.e01.com
+
+cp ~/wise/home.html /var/www/wise.e01.com
+cp ~/wise/index.php /var/www/wise.e01.com
+cp ~/wise/anya.jpg /var/www/wise.e01.com
+
+cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/wise.e01.com.conf
+```
+Buka file wise.e01.com.conf dan edit seperti konfigurasi berikut.
+
+Nameserver 10.22.3.2
+Nameserver 10.22.2.2
+
+Aktifkan konfigurasi website dengan command berikut.
+
+a2ensite franky.a08.com.conf
+Restart apache2.
+
 #### SSS atau Garden
 
 Lakukan *testing* pada `SSS` dan `Garden` untuk cek apakah [**wise.e01.com**](wise.e01.com) atau [**www.wise.e01.com**](www.wise.e01.com) dapat diakses. Menggunakan **Lynx** untuk mengeceknya. *Install* terlebih dahulu **Lynx** jika belum ada.
@@ -338,17 +501,29 @@ apt-get install lynx -y
 Kemudian, lakukan perintah ini untuk membuka website.
 
 Jika sukses, maka akan memunculkan hasil seperti berikut.
+![image](https://user-images.githubusercontent.com/85062827/198831397-ea4b3760-883f-4376-91db-e6ddfeb6cc72.png)
 
 ## Soal 9
 #### Setelah itu, Loid juga membutuhkan agar url www.wise.yyy.com/index.php/home dapat menjadi menjadi www.wise.yyy.com/home
 #### Jawaban
 
-### Wise
+### Eden
 
 Buka *file* **wise.e01.com.conf** dan tambahkan seperti konfigurasi berikut.
+```
+<Directory /var/www/wise.e01.com>
+	Options +FollowSymLinks -Miltiviews
+	AllowOverride All
+</Directory>
+```
 
 Buat *file* **.htaccess** pada folder **/var/www/wise.e01.com** dan tambahkan seperti konfigurasi berikut.
-
+```
+RewriteEngine On
+RewriteCOnd %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php/$1 [L]
+```
 Aktifkan **module rewrite** agar penulisan URL menjadi lebih rapi.
 ```
 a2enmod rewrite
@@ -361,9 +536,10 @@ service apache2 restart
 ### SSS atau Garden
 
 Lakukan *testing* pada `SSS` dan `Garden` untuk cek apakah **module rewrite** berhasil dilakukan.
-
-
-Jika sukses, maka akan memunculkan hasil seperti berikut.
+```
+lynx wise.e01.com/home
+```
+![image](https://user-images.githubusercontent.com/85062827/198831397-ea4b3760-883f-4376-91db-e6ddfeb6cc72.png)
 
 
 ## Soal 10
@@ -407,8 +583,8 @@ service apache2 restart
 
 Lakukan *testing* pada `SSS` dan `Garden` untuk cek apakah [**super.wise.e01.com**](super.wise.e01.com) atau [**www.super.wise.e01.com**](www.super.wise.e01.com) dapat diakses. 
 ```
-lynx super.wise.e01.com
-lynx www.super.wise.e01.com
+lynx eden.wise.e01.com
+lynx www.eden.wise.e01.com
 ```
-
-Jika sukses, maka akan memunculkan hasil seperti berikut.
+# Kendala
+Kendala Utama yang dialami saat mengerjakan nomor 8, 9, dan 10 dimana output tidak sesuai dengan yang diharapkan

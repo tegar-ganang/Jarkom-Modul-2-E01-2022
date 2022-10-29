@@ -86,6 +86,7 @@ Setelah itu ketikkan command ini pada router `Ostania` untuk melihat IP DNS
 cat /etc/resolv.conf
 ```
 Nameserver akan muncul dan ini dapat digunakan pada konfigurasi selanjutnya
+
 ![image](https://user-images.githubusercontent.com/85062827/198767649-5250f8dd-76e0-4a29-a75d-cb48f8545ac9.png)
 #### Konfigurasi semua node (kecuali Ostania)
 Agar semua node yang berhubungan dapat mengakses internet, jalankan perintah beriku dan gunakan IP DNS dari `Ostania`
@@ -154,6 +155,7 @@ ping wise.e01.com -c 5
 ping www.wise.e01.com -c 5
 ```
 jika sukses maka akan memunculkan sebagai berikut
+
 ![image](https://user-images.githubusercontent.com/85062827/198781176-96a1106d-2b24-4364-b3b4-a95cb0059a3b.png)
 
 
@@ -184,6 +186,7 @@ www.eden                IN      CNAME   eden
 ```
 #### SSS atau Garden
 lakukan testing pada `sss` dan `Garden` apakah eden.wise.e01.com atau www.eden.wise.e01.com dapat diakses. jika sukses, maka akan memunculkan hasil seperti berikut.
+
 ![image](https://user-images.githubusercontent.com/85062827/198790731-26c29310-611a-4375-945c-8fda840c78a0.png)
 
 ## Soal 4
@@ -234,6 +237,7 @@ nameserver 10.22.3.2
 '  > /etc/resolv.conf
 host -t PTR 10.22.3.2
 ```
+
 ![image](https://user-images.githubusercontent.com/85062827/198800770-cf0cd06f-da26-4b62-b159-d2fe11fe266e.png)
 
 ## Soal 5
@@ -288,6 +292,7 @@ ping wise.e01.com -c 5
 ```
 	
 hasilnya seperti berikut
+
 ![image](https://user-images.githubusercontent.com/85062827/198814003-38622ff9-0870-4691-bda4-dda0bca6f49a.png)
 
 #### Jawaban
